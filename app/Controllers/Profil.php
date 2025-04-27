@@ -3,25 +3,33 @@
 namespace App\Controllers;
 
 /**
- * Classe Profil
+ * La classes Profil représent le contrôleur de l'entité métier profil
  */
 class Profil extends BaseController
 {
     public $profilsModel;
 
+    /**
+    * Le constructeur de la classe Profil contrôleur
+    */
     public function __construct()
     {
         $this->profilsModel = model('Profil');
     }
 
+    /**
+     * Méthode qui vérifie l'authorization d'un utilisateur sur la classe Profil contrôleur
+     * @return Boolean
+     */
     private function isAuthorized(): bool
     {
         $user = auth()->user();
         return $user->inGroup('admin');
     }
 
-    //------------------------------------------
-    //Liste
+    /**
+     * Méthode qui affiche la liste des profiles dans la vue
+     */
     public function liste()
     {
         if (!$this->isAuthorized()) {
@@ -37,9 +45,9 @@ class Profil extends BaseController
         );
     }
 
-    //------------------------------------------
-    //Ajouter
-
+   /**
+    * Méthode qui dirige vers la vue d'ajout profil
+    */
     public function ajout()
     {
         if (!$this->isAuthorized()) {
@@ -49,7 +57,9 @@ class Profil extends BaseController
         return view('profils_ajoute');
     }
 
-    //Create
+    /**
+     * Méthdoe qui va créer un nouvelle profil
+     */
     public function create()
     {
         if (!$this->isAuthorized()) {
@@ -61,8 +71,10 @@ class Profil extends BaseController
 
         return redirect('profils_liste');
     }
-    //------------------------------------------
-    // Modifier
+    
+    /**
+     * Méthode qui vers la vue modification d'un profil 
+     */
     public function modif($profil)
     {
         if (!$this->isAuthorized()) {
@@ -79,7 +91,9 @@ class Profil extends BaseController
         );
     }
 
-    // Update
+    /**
+     * Méthode qui modifier un profil
+     */
     public function update()
     {
         if (!$this->isAuthorized()) {
@@ -91,8 +105,10 @@ class Profil extends BaseController
 
         return redirect('profils_liste');
     }
-    //------------------------------------------
-    // Delete
+    
+    /**
+     * Méthode qui supprime un profil
+     */
     public function delete()
     {
         if (!$this->isAuthorized()) {

@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 /**
- * Classe Salarier
+ * La classes Salarie représent le contrôleur de l'entité métier salarié
  */
 class Salarie extends BaseController
 {
@@ -11,6 +11,9 @@ class Salarie extends BaseController
     private $profilModel;
     private $salarieProfilModel;
 
+    /**
+     * Le constructeur de la classe Salarie contrôleur
+     */
     public function __construct()
     {
         $this->salarieModel = model('Salarie');
@@ -18,15 +21,19 @@ class Salarie extends BaseController
         $this->salarieProfilModel = model('SalarieProfil');
     }
 
+    /**
+     * Méthode qui vérifie l'authorization d'un utilisateur sur la classe Salarie contrôleur
+     * @return Boolean
+     */
     private function isAuthorized(): bool
     {
         $user = auth()->user();
         return $user->inGroup('admin') || $user->inGroup('rhu');
     }
 
-    //-----------------------------------
-    // Liste
-
+   /**
+    * Méthdoe qui affiche la liste des salariés
+    */
     public function liste()
     {
         if (!$this->isAuthorized()) {
@@ -42,7 +49,6 @@ class Salarie extends BaseController
         // Récupérer les salariés filtrés ou non
         if ($profilId) {
             $listeSalaries = $this->salarieModel->recupSalariesDuProfil((int) $profilId);
-            // die(var_dump($listeSalaries));
         } else {
             $listeSalaries = $this->salarieModel->findAllAvecProfils();
         }
@@ -58,9 +64,9 @@ class Salarie extends BaseController
         );
     }
 
-    //-----------------------------------
-    // Ajouter
-
+    /**
+     * Méthode qui dirige vers la vue d'ajout salarié
+     */
     public function ajout()
     {
         if (!$this->isAuthorized()) {
@@ -78,7 +84,9 @@ class Salarie extends BaseController
         );
     }
 
-    // Create
+    /**
+     * Méthode qui céer un nouvelle salarié
+     */
     public function create()
     {
         if (!$this->isAuthorized()) {
@@ -100,8 +108,9 @@ class Salarie extends BaseController
         return redirect('salarie_liste');
     }
 
-    //-----------------------------------
-    // Modifier
+   /**
+    * Méthode qui dirige vers la vue modification d'un salarié
+    */
     public function modif($salarieId)
     {
         if (!$this->isAuthorized()) {
@@ -122,7 +131,9 @@ class Salarie extends BaseController
         );
     }
 
-    // Update
+    /**
+     * Méthode qui modifié le salarié
+     */
     public function update()
     {
         if (!$this->isAuthorized()) {
@@ -131,14 +142,15 @@ class Salarie extends BaseController
 
         $salarieData = $this->request->getpost();
         $this->salarieModel->save($salarieData);
-        
+
         $this->salarieModel->deleteMissionSalarie($salarieData['ID_SALARIE']);
 
         return redirect('salarie_liste');
     }
 
-    //-------------------------------------
-    // Delete
+   /**
+    * Méthode qui supprime un salarié
+    */
     public function delete()
     {
         if (!$this->isAuthorized()) {
@@ -152,9 +164,9 @@ class Salarie extends BaseController
         return redirect('salarie_liste');
     }
 
-    //-----------------------------------------
-    //modifier profils salarie (ajouter/supprimer)
-
+    /**
+     * Méthode qui affectera un profil à un salarié
+     */
     public function ajoutProfil()
     {
         if (!$this->isAuthorized()) {
@@ -168,20 +180,19 @@ class Salarie extends BaseController
         return redirect()->to(url_to("salarie_modif", $idSalarie));
     }
 
+    /**
+     * Méthode qui supprimera un profil d'un salarié
+     */
     public function supprProfil()
     {
         if (!$this->isAuthorized()) {
             return redirect('accueil');
         }
 
-        // $data = $this->request->getPost();
         $idSalarie = $this->request->getPost('ID_SALARIE');
         $idProfil = $this->request->getPost('ID_PROFIL');
         $this->salarieModel->deleteProfilSalarie($idSalarie, $idProfil);
 
         return redirect()->to(url_to("salarie_modif", $idSalarie));
     }
-
-
-
 }

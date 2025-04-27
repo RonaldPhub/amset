@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 /**
- * Classe qui gère les mission
+ * La classes Mission représent le contrôleur de l'entité métier mission 
  */
 class Mission extends BaseController
 {
@@ -12,10 +12,9 @@ class Mission extends BaseController
     private $profilModel;
     private $salarieModel;
 
-    /**
-     * Constructeur de la modèle Mission
-     * Instanciation de modèl mission
-     */
+   /**
+    * Le constructeur de la classe Mission contrôleur
+    */
     public function __construct()
     {
         $this->missionModel = model('Mission');
@@ -24,6 +23,10 @@ class Mission extends BaseController
         $this->salarieModel = model('Salarie');
     }
 
+    /**
+     * Méthode qui vérifie l'authorization d'un utilisateur sur la classe Mission contrôleur
+     * @return Boolean
+     */
     private function isAuthorized(): bool
     {
         $user = auth()->user();
@@ -32,30 +35,25 @@ class Mission extends BaseController
 
 
     /**
-     * Méthode qui liste tous les mssion dans la vue
+     * Méthode qui affiche la liste tous les mssion dans la vue
      */
     public function liste()
     {
         if (!$this->isAuthorized()) {
             return redirect('accueil');
         }
-
+        //Contient la liste de tout les mission
         $listeMission = $this->missionModel->findAll();
+
+        //Contient la liste des missions avec les clients et profils associés
         $clientMissionProfils = $this->missionModel->getClientMissionProfil();
-        // die(var_dump($clientMissionProfil)); 
-        $missionClients = $this->missionModel->getMissionClient();
-        // die(var_dump($missionClients)); 
-        // $missionProfils = $this->missionModel->getMissionProfil();
-        // die(var_dump($missionProfils)); 
 
+        //Contient la liste des missions avec leur clients associés 
+        $missionClients = $this->missionModel->getMissionClient(); 
+
+        //Contient la liste des missions avec leur salariés associés
         $listeJoinMissionSalarie = $this->missionModel->getJoinMissionSalarie();
-        // die(var_dump($joinMissionSalarie)); 
-
-        //affecter un variable qui va contenir le salarié affecter
-
-        //affecter un variable qui y aura les mission de profils
-
-        //Retourn la vue 'mission_liste'
+        
         return view('mission_liste', [
             'listeMission' => $listeMission,
             'missionClients' => $missionClients,
@@ -65,7 +63,7 @@ class Mission extends BaseController
     }
 
     /**
-     * Méthode qui renvoie vers le formulaire d'ajout mission
+     * Méthode qui dirige vers la vue d'ajout mission
      */
     public function ajout()
     {
@@ -83,7 +81,7 @@ class Mission extends BaseController
     }
 
     /**
-     * Méthode qui crée le mission
+     * Méthode qui créer un nouvelle mission
      */
     public function create()
     {
@@ -97,14 +95,13 @@ class Mission extends BaseController
         // récupérer l'id de mission généré lors de la précédente insertion
         $nouvelMissionId = $this->missionModel->getInsertID();
 
-        // var_dump($data);
-
-        // foreach sur les profils
         $profils = $this->request->getPost('profils[]');
-        // var_dump($profils);
+
+        //Un boucle qui parcour tout les profiles potentiellement créer  
         foreach ($profils as $idProfil) {
-            // var_dump($idProfil);
+            //Contient le nombre de profil
             $nbre = $this->request->getPost($idProfil);
+            //L'insertion vers la base
             $this->missionModel->addProfil($nouvelMissionId, $idProfil, $nbre);
         }
 
@@ -112,7 +109,7 @@ class Mission extends BaseController
     }
 
     /**
-     * Méthode qui réaffiche le mission à modifier
+     * Méthode qui affiche le mission à modifier
      */
     public function modif($missionId)
     {
@@ -124,16 +121,12 @@ class Mission extends BaseController
         $mission = $this->missionModel->find($missionId);
         //Table client
         $listeClient = $this->clientModel->findAll();
-        //Table profils
+        //Contient la liste des profils
         $listeProfil = $this->profilModel->findAll();
-        //Jointure sur client, mission, profil
+        //Contient la jointure sur client, mission, profil
         $missionJoins = $this->missionModel->getJoinMissionInfo($missionId);
-
+        //Contient les profils absent dans la misison
         $profilNotInMissions = $this->profilModel->getProfilNotInMission($missionId);
-
-        // die(var_dump($profilNotInMission));
-
-
 
         return view('mission_modifier', [
             'mission' => $mission,
@@ -153,30 +146,15 @@ class Mission extends BaseController
             return redirect('accueil');
         }
 
-
-
+        //Contient les données à modifier
         $data = $this->request->getPost();
-        // die(var_dump($data));
         if (isset($data)) {
 
-            // $data = $this->request->getPost(['ID_CLIENT', 'INTITULE_MISSION', 'DESCRIPTION_MISSION', 'DATE_DEBUT', 'DATE_FIN']);
             $data = $this->request->getPost();
-            // die(var_dump($data));
             $this->missionModel->save($data);
 
-
             $missionId = $this->request->getPost('ID_MISSION');
-            // die(var_dump($missionId));
-            // $profilId = $this->request->getPost('profil');
-            // $nbre = $this->request->getPost('nombreProfil');
-
-            // if ($missionId != null && $profilId != null && $nbre != null) {
-
-            //     $this->missionModel->addProfil($missionId, $profilId, $nbre);
-            // }
-
-            // delete les affectation dans la table salarie_mission
-            // dd($data);
+        
             $this->missionModel->deleteSalarieMission($missionId);
 
 
@@ -184,6 +162,9 @@ class Mission extends BaseController
         }
     }
 
+    /**
+     * Méthode qui gère la modification d'ajout du profil dans un mission
+     */
     public function updateAddProfil()
     {
 
@@ -200,6 +181,9 @@ class Mission extends BaseController
         return redirect()->to('modif-mission-' . $missionId);
     }
 
+    /**
+     * Méthode qui gère la modification de suppression du profil dans un mission
+     */
     public function updateDeleteProfil()
     {
         if (!$this->isAuthorized()) {
@@ -207,16 +191,14 @@ class Mission extends BaseController
         }
 
         $missionId = $this->request->getPost('ID_MISSION');
-        // die(var_dump($missionId));
         $profilId = $this->request->getPost('ID_PROFIL');
-        // die(var_dump($profilId));
         $this->missionModel->deleteProfil($missionId, $profilId);
 
         return redirect()->to('modif-mission-' . $missionId);
     }
 
     /**
-     * Méthode qui supprime le mission
+     * Méthode qui supprime un mission
      */
     public function delete()
     {
@@ -226,31 +208,17 @@ class Mission extends BaseController
 
 
         $missionId = $this->request->getPost('ID_MISSION');
-        // die(var_dump($missionId));
-        //Instruction pour supprimer le mission
-        // $profils = $this->request->getPost('profils[]');
-        // die(var_dump($profils));
-        // foreach ($profils as $idProfil) {
+        
         $this->missionModel->deleteProfilMission($missionId);
         $this->missionModel->deleteSalarieMission($missionId);
-        // }
-        // $this->missionModel->deleteMissionProfil($missionId);/
         $this->missionModel->delete($missionId);
 
         return redirect('mission_liste');
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * Méthode qui dirige vers la page d'affectation des salariés au misison
+     */
     public function PageAttributionDesSalarie($missionId)
     {
         if (!$this->isAuthorized()) {
@@ -259,6 +227,7 @@ class Mission extends BaseController
 
         $mission = $this->missionModel->find($missionId);
 
+        //Contient tout les mission avec leur profils associés
         $profilsMission = $this->missionModel->getMissionProfil($missionId);
 
         $listeSalarie = $this->salarieModel->findAll();
@@ -266,11 +235,6 @@ class Mission extends BaseController
         foreach ($listeSalarie as $salarie) {
             $profilsSalarie[] = $this->salarieModel->getProfil($salarie['ID_SALARIE']);
         }
-
-        // die(var_dump($mission));
-        // die(var_dump($missionId));
-        // die(var_dump($profilsMission));
-        // die(var_dump($listeSalarie));
 
         return view('mission_affecter_salarier', [
             'mission' => $mission,
@@ -280,64 +244,27 @@ class Mission extends BaseController
         ]);
     }
 
-
+    /**
+     * Méthode qui valide l'affectation des salariés au mission
+     */
     public function affect()
     {
 
         $data = $this->request->getPost();
-        // die(var_dump($data));
         $nbr = $this->request->getPost('nbr');
-        // // die(var_dump($nbr));
 
         $missionId = $this->request->getPost('ID_MISSION_0');
-        // // die(var_dump($missionId));
-
-        // $salarieId = $this->request->getPost('ID_SALARIE_0');
-        // // die(var_dump($salarieId));
-
-        // //Cree un methode 
-        // $verif = $this->missionModel->verifSalarieMission($missionId, $salarieId);
-        // // die(var_dump($verif));
-
-        // $nombreMission = $this->missionModel->getNombreSalarieMission($missionId);
-        // die(var_dump($nombreMission));
-
-        // //Cree un condition ou il verifie si les cle primaire sont deja inserer dand salarie_mission
-        // if ($verif == true) {
-        //     $this->missionModel->deleteSalarieMission($missionId);
-        // } 
-        // if ($nombreMission >= $nbr) {
-        //     $this->missionModel->deleteSalarieMission($missionId);
-        // }
-
-        // $this->missionModel->addSalarieMission($salarieId, $missionId);
-
-
-
-
 
         $this->missionModel->deleteSalarieMission($missionId);
 
-        //Cette partie est OK mais il faut que je vérifie si c'est le même
-        // for ($i = 0; ($i < $nbr); $i++) {
-        //     $idSalarie = $this->request->getPost('ID_SALARIE_' . $i);
-        //     $idMission = $this->request->getPost('ID_MISSION_' . $i);
-        //     $this->missionModel->addSalarie($idSalarie, $idMission);
-        // };
-
-        //Cette partie vérifie si c'est le même
+        //Un boucle qui va parcourir le nombre de fois de profil
         for ($i = 0; ($i < $nbr); $i++) {
             $salarieId = $this->request->getPost('ID_SALARIE_' . $i);
-            // dd($salarieId);
             $missionId = $this->request->getPost('ID_MISSION_' . $i);
             $salarieId2 = $this->request->getPost('ID_SALARIE_' . ($i + 1));
-            // var_dump($data);
-            // die();
-            // var_dump($idSalarie2);
+           
             $nombreMission = $this->missionModel->getNombreSalarieMission($missionId);
-            // die(var_dump($nombreMission));
-            // die(var_dump($nombreMission));
-
+           
             if ($salarieId != '' || $salarieId != null) {
                 if ($salarieId == $salarieId2) {
                     echo '<h1>Selection des salariés non valide !<h1>';
@@ -345,18 +272,7 @@ class Mission extends BaseController
 
                     $this->missionModel->deleteSalarieMission($missionId);
                     die();
-                    // } elseif ($nombreMission > $nbr) {
-                    //     $this->missionModel->deleteSalarieMission($missionId);
-
-                    // elseif(array_count_values($listeSalarie)[$this->request->getPost('ID_SALARIE_' . $i)] > 1 ){
-
-                    // foreach($listeSalarie as $salarieId){
-
-                    //     if(array_count_values($listeSalarie)[$salarieId] > 1 ){
-
-                    //     }
-
-                    // }
+                   
                 } else {
 
                     $this->missionModel->addSalarieMission($salarieId, $missionId);
@@ -371,47 +287,4 @@ class Mission extends BaseController
         return redirect()->to(url_to("mission_liste", $missionId));
     }
 
-
-
-    // }
-    //     public function affect()
-    // {
-    //     $data = $this->request->getPost();
-    //     $nbr = $this->request->getPost('nbr'); // Number of workers required
-    //     $profile = $this->request->getPost('ID_PROFIL'); // Required profile for the mission
-    //     // die(var_dump($profile));
-    //     $missionId = $this->request->getPost('ID_MISSION');
-    //     die(var_dump($missionId));
-
-    //     // Retrieve workers matching the required profile
-    //     $availableWorkers = $this->missionModel->getAvailableWorkersByProfile($profile);
-
-    //     if (count($availableWorkers) === 0) {
-    //         session()->setFlashdata('error', 'Aucun salarié ne correspond au profil demandé.');
-    //         return redirect()->to(url_to("attribution_mission", $missionId));
-    //     }
-
-    //     // Get the current number of workers assigned to this mission
-    //     $currentCount = $this->missionModel->getNombreSalarieMission($missionId);
-
-    //     if ($currentCount >= $nbr) {
-    //         session()->setFlashdata('error', 'Le nombre requis de salariés est déjà atteint pour cette mission.');
-    //         return redirect()->to(url_to("mission_liste", $missionId));
-    //     }
-
-    //     // Assign workers to the mission until the required number is reached
-    //     foreach ($availableWorkers as $worker) {
-    //         if ($currentCount >= $nbr) {
-    //             break; // Stop if we’ve assigned the required number of workers
-    //         }
-
-    //         $result = $this->missionModel->addSalarieMission($worker['ID_SALARIE'], $missionId);
-    //         if ($result) {
-    //             $currentCount++;
-    //         }
-    //     }
-
-    //     session()->setFlashdata('success', 'Affectation réussie.');
-    //     return redirect()->to(url_to("mission_liste", $missionId));
-    // // }
 }

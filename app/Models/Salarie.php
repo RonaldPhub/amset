@@ -4,6 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+/**
+ * La classes Salarié représent le modèle de l'entité métier salarié
+ */
 class Salarie extends Model
 {
     protected $table = 'salarie';
@@ -49,7 +52,11 @@ class Salarie extends Model
     protected $beforeDelete = [];
     protected $afterDelete = [];
 
-    // insertion dans la table "salarie_profils" (ajoute  un  profils au salarie)
+    /**
+     * Méthode d'insertion d'un profils au salarie dans la table "salarie_profils" 
+     * @param Integer $idProfil
+     * @param Integer $idSaarie
+     */
     public function addProfil($idProfil, $idSalarie)
     {
         if ($idProfil != null) {
@@ -60,13 +67,13 @@ class Salarie extends Model
                 'ID_PROFIL' => $idProfil,
                 'ID_SALARIE' => $idSalarie
             ]);
-
-            // var_dump($idProfil, $idSalarie);
-            // die();
         }
     }
 
-    //methode pour le filtre
+    /**
+     * Méthode de filtration un salarié par rapport à un profil
+     * @param Integer $idProfil
+     */
     public function recupSalariesDuProfil($idProfil = null)
     {
         $builder = $this->db->table('salarie s')
@@ -84,7 +91,10 @@ class Salarie extends Model
             ->getResultArray();
     }
 
-    //retourne tout les profils qui sont crée dans la  table profils
+    /**
+     * Méthode de récupération d'un prodil selon le salarié dans la table "salarie_profil"
+     * @param Integer $idSalarie
+     */
     public function getProfil($idSalarie)
     {
         $db = \Config\Database::connect();
@@ -95,7 +105,9 @@ class Salarie extends Model
     }
 
 
-    // affiche tout les profils du salrier qui sont relier au lui
+    /**
+     * Méthode d'affiche tout les profils du salrier
+     */
     public function findAllAvecProfils()
     {
         return $this->db->table('salarie')
@@ -106,10 +118,11 @@ class Salarie extends Model
             ->get()
             ->getResultArray();
     }
-    //----------------------------------------------------------------------
-    // delete
-
-    // supprime l'id du salarier dans la table "salarie_profil" 
+    
+    /**
+     * Méthode de suppression d'un salarié dans la table "salarie_profil".
+     * @param Integer $idSalarie
+     */
     public function deleteProfilsSalarie($idSalarie)
     {
         $db = \Config\Database::connect();
@@ -118,7 +131,10 @@ class Salarie extends Model
         $builder->delete();
     }
 
-    // supprime l'id du salarier dans la table "salarie_mission" 
+    /**
+     * Méthode de suppression d'un salarié dans la table "salarie_mission".
+     * @param Integer $idSalarie
+     */
     public function deleteMissionSalarie($idSalarie)
     {
         $db = \Config\Database::connect();
@@ -127,7 +143,11 @@ class Salarie extends Model
         $builder->delete();
     }
 
-    // supprime l'id du profils et du salarier dans la table "salarie_profil"
+    /**
+     * Méthode de suppression d'un salarié et profil dans la table "salarie_profil".
+     * @param Integer $idSalarie
+     * @param Integer $idProfil
+     */
     public function deleteProfilSalarie($idSalarie, $idProfil)
     {
         $db = \Config\Database::connect();

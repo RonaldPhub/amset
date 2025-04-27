@@ -4,6 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+/**
+ * La classes Profil représent le modèle de l'entité métier profil
+ */
 class Profil extends Model
 {
     protected $table            = 'profil';
@@ -42,9 +45,13 @@ class Profil extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    /**
+     * Méthode de récupération de tout les profil absent selon un salarié
+     * @param Integer $idSalarie
+     */
     public function getProfilsNotSalarie($idSalarie)
     {
-        $db = \Config\Database::connect(); // Connexion à la base de données
+        $db = \Config\Database::connect();
 
         $sql = 'SELECT profil.ID_PROFIL, profil.LIBELLE 
             FROM `profil` 
@@ -53,10 +60,13 @@ class Profil extends Model
             AND `salarie_profil`.`ID_SALARIE` = ? 
             WHERE `salarie_profil`.`ID_PROFIL` IS NULL;';
 
-        // Exécution de la requête avec le paramètre lié
         return $db->query($sql, [$idSalarie])->getResultArray();
     }
 
+    /**
+     * Méthode de récupération de tout les profil absent selon un mission
+     * @param Integer $missionId
+     */
     public function getProfilNotInMission($missionId){
         $db = \Config\Database::connect();
         $sql = 'SELECT profil.ID_PROFIL, profil.LIBELLE

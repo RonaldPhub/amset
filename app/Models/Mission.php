@@ -4,6 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+/**
+ * La classes Mission représent le modèle de l'entité métier mission
+ */
 class Mission extends Model
 {
     protected $table = 'mission';
@@ -46,7 +49,12 @@ class Mission extends Model
     protected $beforeDelete = [];
     protected $afterDelete = [];
 
-    //Methode pour afficher
+    /**
+     * Méthode d'insertion sur la table "profil_mission"
+     * @param Integer $idMission
+     * @param Integer $idProfil
+     * @param Integer $nombreProfil
+     */
     public function addProfil($idMission, $idProfil, $nombreProfil)
     {
         $db = \Config\Database::connect();
@@ -59,7 +67,9 @@ class Mission extends Model
         ]);
     }
 
-    //Methode pour afficher
+    /**
+     * Méthode de jointure entre les table "mission", "client", "profil_mission" et "profil"
+     */
     public function getClientMissionProfil()
     {
         return (
@@ -72,7 +82,9 @@ class Mission extends Model
         );
     }
 
-    //Methode pour recuperer entre mission et salarie_mission
+    /**
+     * Methode pour recuperer entre les tables "mission" et "salarie_mission"
+     */
     public function getJoinMissionSalarie()
     {
         return (
@@ -84,9 +96,11 @@ class Mission extends Model
         );
     }
 
-    /// Fonction insérant un salarie selon l'idSalarie et l'idMission
-    /// ! adapter selon la base de données !
-
+    /**
+     * Méthode d'insertion d'un salarié et mission dans la table "salarie_mission"
+     * @param Integer $idSalarie
+     * @param Integer $idMission
+     */
     public function addSalarieMission($idSalarie, $idMission)
     {
         $db = \Config\Database::Connect();
@@ -97,9 +111,10 @@ class Mission extends Model
         ]);
     }
 
-    /// Fonction supprimant tout les salaries selon l'idMission
-    /// ! adapter selon la base de données !
-
+    /**
+     * Méthode supprimant tout les salaries selon l'idMission
+     * @param Integer $missionId
+     */
     public function deleteSalarieMission($missionId)
     {
         $db = \Config\Database::Connect();
@@ -109,6 +124,9 @@ class Mission extends Model
         $builder->delete();
     }
 
+    /**
+     * Méthode de jointure entre les table "client" et "mission"
+     */
     public function getMissionClient()
     {
         return (
@@ -120,25 +138,28 @@ class Mission extends Model
         );
     }
 
-
-    // // Join sur mission et profil
-
-    public function getMissionProfil($idmission)
+    /**
+     * Méthode de jointure entre les tables "mission" et "profil"
+     * @param Integer $idMission
+     */
+    public function getMissionProfil($idMission)
     {
         return (
             $this->select('pm.ID_PROFIL, pm.ID_MISSION, pm.NOMBRE_PROFIL, p.LIBELLE')
             ->from('profil_mission pm')
             ->join('mission m', 'm.ID_MISSION = pm.ID_MISSION')
             ->join('profil p', 'p.ID_PROFIL = pm.ID_PROFIL')
-            ->where('pm.ID_MISSION', $idmission)
+            ->where('pm.ID_MISSION', $idMission)
             ->groupBy('pm.ID_PROFIL') // Grouper par ID_PROFIL pour éviter les doublons
             ->orderBy('pm.ID_PROFIL')
             ->findAll()
         );
     }
 
-
-    //Methode pour afficher avec id de mission
+    /**
+     * Méthode de jointure entre les table "mission", "client", "profil_mission" et "profil" selon l'id du mission
+     * @param Integer $missionId
+     */
     public function getJoinMissionInfo($missionId)
     {
         return (
@@ -152,6 +173,11 @@ class Mission extends Model
         );
     }
 
+    /**
+     * Méthode de supression selon l'id mission et profil dans la table "profil_mission"
+     * @param Integer $missionId
+     * @param Integer $profilId
+     */
     public function deleteProfil($missionId, $profilId)
     {
         $db = \Config\Database::connect();
@@ -161,6 +187,10 @@ class Mission extends Model
         $builder->delete();
     }
 
+    /**
+     * Méthode de supression selon l'id mission dans la table "profil_mission"
+     * @param Integer $missionId
+     */
     public function deleteProfilMission($missionId)
     {
         $db = \Config\Database::connect();
@@ -169,7 +199,13 @@ class Mission extends Model
         // $builder->where('ID_PROFIL', $profilId);
         $builder->delete();
     }
-    
+
+    /**
+     * Méthode qui vérifie l'existance les ids de mission et salarié dans la table "salarie_mission"
+     * @param Integer $missionId
+     * @param Integer $salarieId
+     * @return Integer
+     */
     public function verifSalarieMission($missionId, $salarieId)
     {
         $db = \Config\Database::connect();
@@ -184,16 +220,20 @@ class Mission extends Model
         return $exists;
     }
 
+    /**
+     * Méthode de récupération du nombre de mission et salarié selon l'id mission dans la table "salarie_mission"
+     * @param $missionId
+     */
     public function getNombreSalarieMission($missionId)
     {
         $db = \Config\Database::connect();
         $builder = $db->table('salarie_mission');
 
         $count = $builder
-                ->where('ID_MISSION', $missionId)
-                // ->where('ID_SALARIE', $salarieId)
-                ->countAllResults();
+            ->where('ID_MISSION', $missionId)
+            // ->where('ID_SALARIE', $salarieId)
+            ->countAllResults();
 
-        return $count; 
+        return $count;
     }
 }

@@ -2,11 +2,17 @@
 
 namespace App\Controllers;
 
+/**
+ * La classes Client représent le contrôleur de l'entité métier client 
+ */
 class Client extends BaseController
 {
     private $clientModel;
     private $missionModel;
 
+    /**
+     * Le constructeur de la classe contrôleur Client
+     */
     public function __construct()
     {
         $this->clientModel = model('Client');
@@ -14,6 +20,10 @@ class Client extends BaseController
 
     }
 
+    /**
+     * Méthode qui vérifie l'authorization d'un utilisateur sur la classe Client
+     * @return Boolean
+     */
     private function isAuthorized(): bool
     {
         $user = auth()->user();
@@ -21,9 +31,10 @@ class Client extends BaseController
 
     }
 
-    //-------------------------------------
-    // affichage
-
+    
+    /**
+     * Méthode qui affiche la liste des clients dans la vue
+     */
     public function liste()
     {
         if (!$this->isAuthorized()) {
@@ -42,9 +53,9 @@ class Client extends BaseController
 
     }
 
-    //-------------------------------------
-    // ajout
-
+    /**
+     * Méthode qui redirige vers la vue d'ajout client
+     */
     public function ajout()
     {
         if (!$this->isAuthorized()) {
@@ -54,7 +65,9 @@ class Client extends BaseController
         return view('clients_ajout');
     }
 
-
+    /**
+     * Méthode qui créer un nouvelle client
+     */
     public function create()
     {
         if (!$this->isAuthorized()) {
@@ -68,9 +81,10 @@ class Client extends BaseController
         return redirect('client_liste');
     }
 
-    //-------------------------------------
-    // modif
-
+    /**
+     * Méthode qui affiche le client à modifier
+     * @param interger $idClient
+     */
     public function modif($idClient)
     {
         if (!$this->isAuthorized()) {
@@ -82,7 +96,9 @@ class Client extends BaseController
         return view('clients_modifier', ['client' => $client]);
     }
 
-
+    /**
+     * Méthode qui modifie un client
+     */
     public function update()
     {
         if (!$this->isAuthorized()) {
@@ -95,9 +111,10 @@ class Client extends BaseController
 
         return redirect('client_liste');
     }
-    //-------------------------------------
-    // Delete
-
+    
+    /**
+     * Méthode qui sert à supprimer un client
+     */
     public function delete()
     {
         if (!$this->isAuthorized()) {
@@ -107,9 +124,6 @@ class Client extends BaseController
         $clientData = $this->request->getPost(['ID_CLIENT']);
 
         $missionData = $this->clientModel->getIdMission($clientData);
-
-        // var_dump($clientData);
-        // die();
 
         $this->clientModel->deleteMissionProfils($missionData);
 

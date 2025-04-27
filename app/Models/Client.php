@@ -4,6 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+/**
+ * La classes Client représent le modèle de l'entité métier client
+ */
 class Client extends Model
 {
     protected $table            = 'client';
@@ -51,31 +54,45 @@ class Client extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function deleteMissionProfils($missionid){
+    /**
+     * Méthode de suppression d'un mission sur la table "profil_mission"
+     * @param Integer $missionid
+     */
+    public function deleteMissionProfils($missionId){
         $db = \Config\Database::Connect();
         $builder = $db->table('profil_mission');
-        $builder->where('ID_MISSION',$missionid);
+        $builder->where('ID_MISSION',$missionId);
         $builder->delete();
 
     }
 
-    public function deleteMissionSalarie($missionid){
+    /**
+     * Méthode de suppression d'un misison sur la table "salarie_mission"
+     * @param Integer $missionId
+     */
+    public function deleteMissionSalarie($missionId){
         $db = \Config\Database::connect();
         $builder = $db->table('salarie_mission');
-        $builder->where('ID_MISSION', $missionid);
+        $builder->where('ID_MISSION', $missionId);
         $builder->delete();
     }
 
-
-    public function deleteMissionClient($client){
+    /**
+     * Méthode de supression d'un client sur la table "mission"
+     * @param Integer $clientId
+     */
+    public function deleteMissionClient($clientId){
         $db = \Config\Database::Connect();
         $builder = $db->table('mission');
-        $builder->where('ID_CLIENT',$client);
+        $builder->where('ID_CLIENT',$clientId);
         $builder->delete();
 
     }
 
-
+    /**
+     * Méthode de récupération d'un client par rapport à leur mission respective
+     * @param Integer $idClient
+     */
     public function getIdMission($idClient){
         return $this->db->table('mission')
             ->select('ID_MISSION')
