@@ -19,7 +19,7 @@
     // die(var_dump($listeJoinMissionSalaries)); 
     
     $table = new \CodeIgniter\View\Table();
-    $table->setHeading('Intitulé', 'Description', 'Client concerné', 'Profil(s) demandés', 'Début', 'Fin', 'Salarié(s) affecter', 'Affecter les salarié', 'Modifier', 'Supprimer');
+    $table->setHeading('Intitulé', 'Description', 'Client test', 'Profil(s) demandés', 'Début', 'Fin', 'Salarié(s) affecter', 'Affecter les salarié', 'Modifier', 'Supprimer');
 
     foreach ($listeMission as $mission) {
         $missionLigne = [];
